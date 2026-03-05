@@ -4,12 +4,14 @@ import pytest
 import requests
 import allure
 
+from utils.data import BASE_URL, ENDPOINTS
+
 
 @allure.feature("Логин пользователя")
 class TestUserLogin:
 
     @allure.title("1. Вход под существующим пользователем")
-    def test_login_existing_user(self, create_user, base_url, endpoints):
+    def test_login_existing_user(self, create_user):
         """Успешная авторизация"""
         user = create_user
         
@@ -20,7 +22,7 @@ class TestUserLogin:
         
         with allure.step("Отправка запроса на авторизацию"):
             response = requests.post(
-                f"{base_url}{endpoints['login']}",
+                f"{BASE_URL}{ENDPOINTS['login']}",
                 json=login_data
             )
         
@@ -35,7 +37,7 @@ class TestUserLogin:
         ("email", "wrong@email.com"),
         ("password", "wrong_password"),
     ])
-    def test_login_with_wrong_credentials(self, create_user, base_url, endpoints, wrong_field, wrong_value):
+    def test_login_with_wrong_credentials(self, create_user, wrong_field, wrong_value):
         """Авторизация с неверными данными"""
         user = create_user
         
@@ -47,7 +49,7 @@ class TestUserLogin:
         
         with allure.step(f"Отправка запроса с неверным {wrong_field}"):
             response = requests.post(
-                f"{base_url}{endpoints['login']}",
+                f"{BASE_URL}{ENDPOINTS['login']}",
                 json=login_data
             )
         

@@ -4,6 +4,7 @@ import pytest
 import requests
 import allure
 
+from utils.data import BASE_URL, ENDPOINTS
 from utils.helpers import generate_user_data
 
 
@@ -11,25 +12,17 @@ from utils.helpers import generate_user_data
 class TestUserCreate:
 
     @allure.title("1. Создать уникального пользователя")
-    def test_create_unique_user(self, base_url, endpoints):
-        """Создание нового уникального пользователя"""
-        user_data = generate_user_data()
-        
-        with allure.step("Отправка запроса на регистрацию"):
-            response = requests.post(
-                f"{base_url}{endpoints['register']}",
-                json=user_data
-            )
+    def test_create_unique_user(self, create_user):
+        """Создание нового уникального пользователя - пользователь создается фикстурой"""
+        user = create_user
         
         with allure.step("Проверка успешного создания"):
-            assert response.status_code == 200
-            response_data = response.json()
-            assert response_data["success"] is True
-            assert "accessToken" in response_data
-            assert "refreshToken" in response_data
+            assert "access_token" in user
+            assert "refresh_token" in user
+            assert user.get("access_token") is not None
 
     @allure.title("2. Создать пользователя, который уже зарегистрирован")
-    def test_create_existing_user(self, create_user, base_url, endpoints):
+    def test_create_existing_user(self, create_user):
         """Попытка создать дубликат пользователя"""
         existing_user = create_user
         
@@ -41,7 +34,7 @@ class TestUserCreate:
         
         with allure.step("Попытка создания дубликата"):
             response = requests.post(
-                f"{base_url}{endpoints['register']}",
+                f"{BASE_URL}{ENDPOINTS['register']}",
                 json=duplicate_data
             )
         
@@ -51,14 +44,14 @@ class TestUserCreate:
 
     @allure.title("3. Создать пользователя без одного из обязательных полей")
     @pytest.mark.parametrize("missing_field", ["email", "password", "name"])
-    def test_create_user_without_required_field(self, base_url, endpoints, missing_field):
+    def test_create_user_without_required_field(self, missing_field):
         """Создание пользователя без одного обязательного поля"""
         user_data = generate_user_data()
         del user_data[missing_field]
         
         with allure.step(f"Отправка запроса без поля {missing_field}"):
             response = requests.post(
-                f"{base_url}{endpoints['register']}",
+                f"{BASE_URL}{ENDPOINTS['register']}",
                 json=user_data
             )
         

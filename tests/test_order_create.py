@@ -4,12 +4,14 @@ import pytest
 import requests
 import allure
 
+from utils.data import BASE_URL, ENDPOINTS
+
 
 @allure.feature("Создание заказа")
 class TestOrderCreate:
 
     @allure.title("1. Создание заказа с авторизацией")
-    def test_create_order_with_auth(self, create_user, get_ingredients, base_url, endpoints):
+    def test_create_order_with_auth(self, create_user, get_ingredients):
         """Создание заказа с авторизацией"""
         user = create_user
         ingredients = get_ingredients
@@ -21,7 +23,7 @@ class TestOrderCreate:
         
         with allure.step("Создание заказа с авторизацией"):
             response = requests.post(
-                f"{base_url}{endpoints['orders']}",
+                f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
                 headers=headers
             )
@@ -31,7 +33,7 @@ class TestOrderCreate:
             assert response.json()["success"] is True
 
     @allure.title("2. Создание заказа без авторизации")
-    def test_create_order_without_auth(self, get_ingredients, base_url, endpoints):
+    def test_create_order_without_auth(self, get_ingredients):
         """Создание заказа без авторизации"""
         ingredients = get_ingredients
         
@@ -41,7 +43,7 @@ class TestOrderCreate:
         
         with allure.step("Создание заказа без авторизации"):
             response = requests.post(
-                f"{base_url}{endpoints['orders']}",
+                f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data
             )
         
@@ -50,7 +52,7 @@ class TestOrderCreate:
             assert response.json()["success"] is True
 
     @allure.title("3. Создание заказа с ингредиентами")
-    def test_create_order_with_ingredients(self, create_user, get_ingredients, base_url, endpoints):
+    def test_create_order_with_ingredients(self, create_user, get_ingredients):
         """Создание заказа с ингредиентами"""
         user = create_user
         ingredients = get_ingredients
@@ -62,7 +64,7 @@ class TestOrderCreate:
         
         with allure.step("Создание заказа с ингредиентами"):
             response = requests.post(
-                f"{base_url}{endpoints['orders']}",
+                f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
                 headers=headers
             )
@@ -72,7 +74,7 @@ class TestOrderCreate:
             assert response.json()["success"] is True
 
     @allure.title("4. Создание заказа без ингредиентов")
-    def test_create_order_without_ingredients(self, create_user, base_url, endpoints):
+    def test_create_order_without_ingredients(self, create_user):
         """Создание заказа без ингредиентов"""
         user = create_user
         
@@ -81,7 +83,7 @@ class TestOrderCreate:
         
         with allure.step("Создание заказа без ингредиентов"):
             response = requests.post(
-                f"{base_url}{endpoints['orders']}",
+                f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
                 headers=headers
             )
@@ -91,7 +93,7 @@ class TestOrderCreate:
             assert response.json()["success"] is False
 
     @allure.title("5. Создание заказа с неверным хешем ингредиентов")
-    def test_create_order_with_invalid_hash(self, create_user, base_url, endpoints):
+    def test_create_order_with_invalid_hash(self, create_user):
         """Создание заказа с неверным хешем"""
         user = create_user
         
@@ -102,7 +104,7 @@ class TestOrderCreate:
         
         with allure.step("Создание заказа с неверным хешем"):
             response = requests.post(
-                f"{base_url}{endpoints['orders']}",
+                f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
                 headers=headers
             )
