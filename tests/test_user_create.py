@@ -12,14 +12,30 @@ from utils.helpers import generate_user_data
 class TestUserCreate:
 
     @allure.title("1. Создать уникального пользователя")
-    def test_create_unique_user(self, create_user):
-        """Создание нового уникального пользователя - пользователь создается фикстурой"""
-        user = create_user
+    def test_create_unique_user(self):
+        """Создание нового уникального пользователя"""
+        user_data = generate_user_data()
+        access_token = None
         
-        with allure.step("Проверка успешного создания"):
-            assert "access_token" in user
-            assert "refresh_token" in user
-            assert user.get("access_token") is not None
+        try:
+            with allure.step("Отправка запроса на регистрацию"):
+                response = requests.post(
+                    f"{BASE_URL}{ENDPOINTS['register']}",
+                    json=user_data
+                )
+            
+            with allure.step("Проверка успешного создания"):
+                assert response.status_code == 200
+                response_data = response.json()
+                assert response_data["success"] is True
+                assert "accessToken" in response_data
+                assert "refreshToken" in response_data
+                access_token = response_data.get("accessToken")
+                
+        finally:
+            if access_token:
+                headers = {"Authorization": access_token}
+                requests.delete(f"{BASE_URL}{ENDPOINTS['user']}", headers=headers)
 
     @allure.title("2. Создать пользователя, который уже зарегистрирован")
     def test_create_existing_user(self, create_user):
@@ -49,12 +65,23 @@ class TestUserCreate:
         user_data = generate_user_data()
         del user_data[missing_field]
         
-        with allure.step(f"Отправка запроса без поля {missing_field}"):
-            response = requests.post(
-                f"{BASE_URL}{ENDPOINTS['register']}",
-                json=user_data
-            )
+        created_token = None
         
-        with allure.step("Проверка ошибки 403"):
-            assert response.status_code == 403
-            assert response.json()["success"] is False
+        try:
+            with allure.step(f"Отправка запроса без поля {missing_field}"):
+                response = requests.post(
+                    f"{BASE_URL}{ENDPOINTS['register']}",
+                    json=user_data
+                )
+            
+            with allure.step("Проверка ошибки 403"):
+                assert response.status_code == 403
+                assert response.json()["success"] is False
+            
+            if response.status_code == 200 and response.json().get("success"):
+                created_token = response.json().get("accessToken")
+                
+        finally:
+            if created_token:
+                headers = {"Authorization": created_token}
+                requests.delete(f"{BASE_URL}{ENDPOINTS['user']}", headers=headers)
