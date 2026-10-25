@@ -23,7 +23,8 @@ class TestUserLogin:
         with allure.step("Отправка запроса на авторизацию"):
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['login']}",
-                json=login_data
+                json=login_data,
+                timeout=15,
             )
         
         with allure.step("Проверка успешной авторизации"):
@@ -50,7 +51,8 @@ class TestUserLogin:
         with allure.step(f"Отправка запроса с неверным {wrong_field}"):
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['login']}",
-                json=login_data
+                json=login_data,
+                timeout=15,
             )
         
         with allure.step("Проверка ошибки 401"):
