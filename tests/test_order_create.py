@@ -17,7 +17,7 @@ class TestOrderCreate:
         ingredients = get_ingredients
         
         order_data = {
-            "ingredients": ingredients[:2] if len(ingredients) >= 2 else ingredients
+            "ingredients": ingredients[:2]
         }
         headers = {"Authorization": user["access_token"]}
         
@@ -25,7 +25,8 @@ class TestOrderCreate:
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
-                headers=headers
+                headers=headers,
+                timeout=15,
             )
         
         with allure.step("Проверка успешного создания"):
@@ -38,13 +39,14 @@ class TestOrderCreate:
         ingredients = get_ingredients
         
         order_data = {
-            "ingredients": ingredients[:2] if len(ingredients) >= 2 else ingredients
+            "ingredients": ingredients[:2]
         }
         
         with allure.step("Создание заказа без авторизации"):
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['orders']}",
-                json=order_data
+                json=order_data,
+                timeout=15,
             )
         
         with allure.step("Проверка успешного создания (API позволяет без авторизации)"):
@@ -58,7 +60,7 @@ class TestOrderCreate:
         ingredients = get_ingredients
         
         order_data = {
-            "ingredients": ingredients[:2] if len(ingredients) >= 2 else ingredients
+            "ingredients": ingredients[:2]
         }
         headers = {"Authorization": user["access_token"]}
         
@@ -66,7 +68,8 @@ class TestOrderCreate:
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
-                headers=headers
+                headers=headers,
+                timeout=15,
             )
         
         with allure.step("Проверка успешного создания"):
@@ -85,7 +88,8 @@ class TestOrderCreate:
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
-                headers=headers
+                headers=headers,
+                timeout=15,
             )
         
         with allure.step("Проверка ошибки 400"):
@@ -106,7 +110,8 @@ class TestOrderCreate:
             response = requests.post(
                 f"{BASE_URL}{ENDPOINTS['orders']}",
                 json=order_data,
-                headers=headers
+                headers=headers,
+                timeout=15,
             )
         
         with allure.step("Проверка ошибки 500"):
